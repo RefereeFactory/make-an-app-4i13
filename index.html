@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloomwell — A Gallery of Flowers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbf7f2;
+    --cream:#fffdfa;
+    --ink:#2f2a33;
+    --muted:#7c7483;
+    --rose:#d46a8a;
+    --rose-deep:#b24c6e;
+    --leaf:#5d8a66;
+    --gold:#e0a85e;
+    --line:#ece3da;
+    --shadow:0 12px 34px rgba(90,60,70,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Nunito Sans',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;line-height:1.15}
+
+  /* HERO */
+  header.hero{
+    position:relative;
+    padding:72px 20px 60px;
+    text-align:center;
+    background:
+      radial-gradient(circle at 18% 22%, rgba(212,106,138,.16), transparent 42%),
+      radial-gradient(circle at 82% 30%, rgba(224,168,94,.18), transparent 46%),
+      radial-gradient(circle at 50% 100%, rgba(93,138,102,.16), transparent 55%),
+      linear-gradient(180deg,#fff7f0,#fbf7f2);
+    overflow:hidden;
+  }
+  .hero .petal{position:absolute;opacity:.5;animation:drift 14s ease-in-out infinite}
+  @keyframes drift{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-18px) rotate(8deg)}}
+  .hero-eyebrow{
+    display:inline-block;letter-spacing:.28em;text-transform:uppercase;
+    font-size:.72rem;font-weight:700;color:var(--rose-deep);margin-bottom:18px;
+  }
+  .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);color:var(--ink);margin-bottom:14px}
+  .hero h1 em{font-style:italic;color:var(--rose-deep)}
+  .hero p{max-width:560px;margin:0 auto;color:var(--muted);font-size:1.08rem}
+  .hero-flowers{font-size:2.3rem;margin-top:26px;letter-spacing:.3em}
+
+  main{max-width:1180px;margin:0 auto;padding:0 20px}
+
+  /* CONTROLS */
+  .controls{
+    margin:-32px auto 36px;position:relative;z-index:5;
+    background:var(--cream);border:1px solid var(--line);
+    border-radius:20px;box-shadow:var(--shadow);
+    padding:20px;display:flex;flex-direction:column;gap:16px;
+  }
+  .search-row{display:flex;gap:10px;flex-wrap:wrap}
+  .search-row input{
+    flex:1;min-width:200px;padding:14px 16px;border:1px solid var(--line);
+    border-radius:12px;font-size:1rem;font-family:inherit;background:#fff;color:var(--ink);
+  }
+  .search-row input:focus{outline:2px solid var(--rose);border-color:transparent}
+  .filters{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    border:1px solid var(--line);background:#fff;color:var(--muted);
+    padding:9px 16px;border-radius:999px;font-size:.9rem;font-weight:700;
+    cursor:pointer;transition:.18s;font-family:inherit;min-height:40px;
+  }
+  .chip:hover{border-color:var(--rose)}
+  .chip[aria-pressed="true"]{background:var(--rose);color:#fff;border-color:var(--rose)}
+  .count{font-size:.85rem;color:var(--muted);text-align:right}
+
+  /* GALLERY */
+  .section-head{text-align:center;margin:10px 0 28px}
+  .section-head h2{font-size:clamp(1.8rem,4vw,2.5rem)}
+  .section-head p{color:var(--muted)}
+
+  .grid{
+    display:grid;gap:22px;grid-template-columns:1fr;padding-bottom:20px;
+  }
+  @media(min-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+  .card{
+    background:var(--cream);border:1px solid var(--line);border-radius:20px;
+    overflow:hidden;box-shadow:0 6px 18px rgba(90,60,70,.07);
+    transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+  .card-art{
+    height:190px;display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .card-art svg{width:150px;height:150px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.08))}
+  .fav{
+    position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;
+    border:none;background:rgba(255,255,255,.82);cursor:pointer;font-size:1.2rem;
+    display:flex;align-items:center;justify-content:center;transition:.18s;
+    backdrop-filter:blur(3px);
+  }
+  .fav:hover{transform:scale(1.1)}
+  .card-body{padding:18px 20px 22px;flex:1;display:flex;flex-direction:column}
+  .card-body h3{font-size:1.35rem;margin-bottom:2px}
+  .card-latin{font-style:italic;color:var(--muted);font-size:.86rem;margin-bottom:10px}
+  .card-body p{font-size:.94rem;color:#55505b;flex:1}
+  .tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .tag{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    padding:5px 10px;border-radius:999px;background:#f3ebe3;color:var(--muted)}
+  .tag.season{background:#eef4ef;color:var(--leaf)}
+  .tag.color{background:#fbe9ef;color:var(--rose-deep)}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1}
+
+  /* SHOP */
+  .shop{
+    margin:50px auto;background:var(--cream);border:1px solid var(--line);
+    border-radius:22px;padding:34px 24px;box-shadow:0 6px 18px rgba(90,60,70,.07);
+  }
+  .shop h2{text-align:center;font-size:1.9rem;margin-bottom:6px}
+  .shop>p{text-align:center;color:var(--muted);margin-bottom:22px}
+  [data-factory-pay]{display:flex;flex-direction:column;gap:12px;max-width:520px;margin:0 auto}
+  .factory-pay-item{display:flex;align-items:center;gap:14px;justify-content:space-between;
+    padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  .factory-pay-name{font-weight:700;font-family:'Fraunces',serif;font-size:1.1rem}
+  .factory-pay-price{color:var(--rose-deep);font-weight:700}
+  .factory-pay-btn{background:var(--rose);color:#fff;border:none;padding:12px 22px;
+    border-radius:999px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px;transition:.18s}
+  .factory-pay-btn:hover{background:var(--rose-deep)}
+
+  /* HOW */
+  .how{margin:40px auto 70px;max-width:760px;text-align:center;padding:0 10px}
+  .how h2{font-size:1.6rem;margin-bottom:18px}
+  .how-grid{display:grid;gap:18px;grid-template-columns:1fr;text-align:left}
+  @media(min-width:640px){.how-grid{grid-template-columns:repeat(3,1fr)}}
+  .how-card{background:var(--cream);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .how-card h3{font-size:1.1rem;margin-bottom:6px;color:var(--rose-deep)}
+  .how-card p{font-size:.92rem;color:var(--muted)}
+
+  footer{text-align:center;padding:34px 20px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+  footer .mark{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--rose-deep)}
+
+  .save-toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120%);
+    background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;
+    font-size:.88rem;font-weight:700;box-shadow:var(--shadow);transition:transform .3s;z-index:50;
+  }
+  .save-toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+<script id="factory-store-sdk">
+window.factory=(function(){
+var K="f8299470-bf16-4aab-9099-a5c6ecdb3dad",U="https://canvbkibjgcnqowjtarf.supabase.co/functions/v1/app-market",A="sb_publishable_sMTQKIeFgT1vwjHnU7Gexg_8CCmhtxs";
+function call(b){b.appKey=K;return fetch(U,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+A},body:JSON.stringify(b)}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||("store "+r.status));return d;});});}
+var S={
+put:function(c,i,d){return call({op:"put",collection:c,id:String(i),data:d}).then(function(x){return x.doc?x.doc.data:null;});},
+get:function(c,i){return call({op:"get",collection:c,id:String(i)}).then(function(x){return x.doc?x.doc.data:null;});},
+list:function(c){return call({op:"list",collection:c}).then(function(x){return x.docs.map(function(d){return d.data;});});},
+remove:function(c,i){return call({op:"delete",collection:c,id:String(i)}).then(function(){return true;});},
+unlock:function(code){return call({op:"redeem",code:String(code)}).then(function(x){try{localStorage.setItem("factory_access",x.status);}catch(e){}return x.status;});},
+access:function(){try{return localStorage.getItem("factory_access")||"none";}catch(e){return "none";}}
+};
+var _c=null;try{var h=(location.hash||"").match(/factory_code=([a-z0-9-]+)/i);_c=h?h[1]:localStorage.getItem("factory_code");if(h){history.replaceState(null,"",location.pathname+location.search);}}catch(e){}
+var F={put:S.put,get:S.get,list:S.list,remove:S.remove,unlock:S.unlock,access:S.access};
+F.ready=_c?S.unlock(_c).then(function(s){try{if(s!=="invalid")localStorage.setItem("factory_code",_c);}catch(e){}return s;}).catch(function(){return S.access();}):Promise.resolve(S.access());
+return F;})();
+</script>
+<script id="factory-pay-sdk">
+(function(){var s=document.createElement("script");s.src="https://canvbkibjgcnqowjtarf.supabase.co/functions/v1/app-pay?sdk=1&repo=make-an-app-4i13&v="+Math.floor(Date.now()/300000);s.async=true;document.head.appendChild(s);})();
+</script>
+</head>
+<body>
+
+<header class="hero">
+  <span class="petal" style="top:12%;left:8%;font-size:2rem">🌸</span>
+  <span class="petal" style="top:20%;right:10%;font-size:2.4rem;animation-delay:2s">🌷</span>
+  <span class="petal" style="bottom:14%;left:14%;font-size:2rem;animation-delay:4s">🌼</span>
+  <span class="petal" style="bottom:20%;right:16%;font-size:1.8rem;animation-delay:1s">🌺</span>
+  <div class="hero-eyebrow">A gallery of flowers</div>
+  <h1>Bloom<em>well</em></h1>
+  <p>A quiet, joyful place to wander through flowers — their names, their seasons, and the small stories they carry. Browse, search, and keep a bouquet of your favourites.</p>
+  <div class="hero-flowers" aria-hidden="true">🌹 🌻 🌷 💐 🌸</div>
+</header>
+
+<main>
+  <section class="controls" aria-label="Browse and filter flowers">
+    <div class="search-row">
+      <label for="search" style="position:absolute;left:-9999px">Search flowers by name</label>
+      <input id="search" type="search" placeholder="Search by name… e.g. rose, lily, tulip">
+    </div>
+    <div class="filters" id="colorFilters" role="group" aria-label="Filter by colour"></div>
+    <div class="filters" id="seasonFilters" role="group" aria-label="Filter by season"></div>
+    <div class="filters" style="justify-content:space-between;align-items:center">
+      <button class="chip" id="favOnly" aria-pressed="false">♥ Favourites only</button>
+      <span class="count" id="count"></span>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <h2>The Collection</h2>
+    <p>Twelve beloved blooms, drawn by hand in colour.</p>
+  </div>
+
+  <div class="grid" id="grid" aria-live="polite"></div>
+
+  <section class="shop">
+    <h2>Bring a little bloom home</h2>
+    <p>If the gardener behind this gallery offers bouquets, prints or seeds, you'll find them here.</p>
+    <div data-factory-pay></div>
+  </section>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <div class="how-grid">
+      <div class="how-card">
+        <h3>Browse</h3>
+        <p>Every flower is hand-drawn in SVG, so the gallery loads instantly with no stock photos.</p>
+      </div>
+      <div class="how-card">
+        <h3>Search &amp; filter</h3>
+        <p>Type a name, or tap a colour or season chip. Combine filters to narrow things down — the count updates live.</p>
+      </div>
+      <div class="how-card">
+        <h3>Save favourites</h3>
+        <p>Tap the heart on any flower. Your bouquet is saved to the cloud and waits for you on your next visit.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="mark">Bloomwell</div>
+  <p>Made with love — one humanity, many petals. 🌍🌸</p>
+</footer>
+
+<div class="save-toast" id="toast">Saved</div>
+
+<script>
+/* ---------- Flower data ---------- */
+const FLOWERS = [
+  {id:"rose",name:"Rose",latin:"Rosa",colors:["red","pink"],season:"summer",
+   desc:"The classic of gardens and gifts, layered with soft petals and a scent that lingers. A gentle emblem of love and gratitude.",
+   petal:"#d1495b",center:"#b03049",shape:"rose"},
+  {id:"tulip",name:"Tulip",latin:"Tulipa",colors:["red","pink","yellow"],season:"spring",
+   desc:"Cup-shaped and upright, tulips open with the first warm days and nod cheerfully in a breeze.",
+   petal:"#e85d75",center:"#c83e59",shape:"tulip"},
+  {id:"sunflower",name:"Sunflower",latin:"Helianthus annuus",colors:["yellow"],season:"summer",
+   desc:"Tall and sunny-faced, turning to follow the light. A symbol of warmth, loyalty and good cheer.",
+   petal:"#f2b134",center:"#6b4226",shape:"daisy"},
+  {id:"daisy",name:"Daisy",latin:"Bellis perennis",colors:["white","yellow"],season:"spring",
+   desc:"Simple and bright, scattered across meadows. Its name means 'day's eye' for the way it opens at dawn.",
+   petal:"#ffffff",center:"#f2c14e",shape:"daisy"},
+  {id:"lily",name:"Lily",latin:"Lilium",colors:["white","pink"],season:"summer",
+   desc:"Elegant trumpets with a heady fragrance. Long loved for their poise and purity.",
+   petal:"#f6e7ea",center:"#e0a85e",shape:"lily"},
+  {id:"lavender",name:"Lavender",latin:"Lavandula",colors:["purple"],season:"summer",
+   desc:"Slender silver stems crowned with purple spikes. Calming to the senses and beloved by bees.",
+   petal:"#9b7cc9",center:"#7b5aa8",shape:"spike"},
+  {id:"orchid",name:"Orchid",latin:"Orchidaceae",colors:["purple","pink","white"],season:"winter",
+   desc:"Exotic and long-lasting, with sculptural blooms. A graceful companion for a bright windowsill.",
+   petal:"#c77dc0",center:"#f2c14e",shape:"orchid"},
+  {id:"poppy",name:"Poppy",latin:"Papaver",colors:["red"],season:"summer",
+   desc:"Papery petals of brilliant red dancing on thin stems. A fleeting, luminous bloom of open fields.",
+   petal:"#e03b2e",center:"#2f2a33",shape:"daisy"},
+  {id:"marigold",name:"Marigold",latin:"Tagetes",colors:["yellow","orange"],season:"autumn",
+   desc:"Ruffled golden heads that glow through the cooler months and keep gardens cheerful.",
+   petal:"#f08a24",center:"#c9631a",shape:"rose"},
+  {id:"cherry",name:"Cherry Blossom",latin:"Prunus serrulata",colors:["pink","white"],season:"spring",
+   desc:"Clouds of soft pink along bare branches, here and gone in a week — a quiet lesson in savouring the moment.",
+   petal:"#f6c2d4",center:"#e58ba7",shape:"blossom"},
+  {id:"hydrangea",name:"Hydrangea",latin:"Hydrangea",colors:["blue","pink","purple"],season:"summer",
+   desc:"Generous rounded clusters of tiny florets that shift colour with the soil. Lush and full.",
+   petal:"#8aa7d6",center:"#6b86bd",shape:"cluster"},
+  {id:"crocus",name:"Crocus",latin:"Crocus",colors:["purple","white","yellow"],season:"winter",
+   desc:"One of the first to pierce late-winter frost, a tiny flame of colour promising spring is near.",
+   petal:"#8c6bc8",center:"#f2b134",shape:"tulip"}
+];
+
+const COLORS = ["red","pink","yellow","orange","white","purple","blue"];
+const SEASONS = ["spring","summer","autumn","winter"];
+
+/* ---------- SVG flower art ---------- */
+function flowerSVG(f){
+  const p=f.petal, c=f.center, s=f.shape;
+  const stem='<path d="M50 72 L50 100" stroke="#5d8a66" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+             '<path d="M50 88 q12 -2 16 -12 q-12 0 -16 12" fill="#6e9b76"/>';
+  let body="";
+  if(s==="daisy"||s==="rose"){
+    let petals="";const n=s==="rose"?12:10;
+    for(let i=0;i<n;i++){const a=i*(360/n);petals+=`<ellipse cx="50" cy="28" rx="7" ry="18" fill="${p}" transform="rotate(${a} 50 50)"/>`;}
+    body=`${petals}<circle cx="50" cy="50" r="11" fill="${c}"/>`;
+  } else if(s==="tulip"){
+    body=`<path d="M38 60 Q36 30 50 24 Q64 30 62 60 Q50 68 38 60 Z" fill="${p}"/>
+          <path d="M50 24 Q50 50 50 62" stroke="${c}" stroke-width="3" fill="none"/>
+          <path d="M38 60 Q40 44 50 62 Q60 44 62 60" fill="${c}" opacity=".35"/>`;
+  } else if(s==="lily"){
+    let petals="";for(let i=0;i<6;i++){const a=i*60;petals+=`<path d="M50 50 Q43 18 50 12 Q57 18 50 50 Z" fill="${p}" transform="rotate(${a} 50 50)"/>`;}
+    body=`${petals}<circle cx="50" cy="50" r="5" fill="${c}"/>
+          <line x1="50" y1="50" x2="50" y2="34" stroke="${c}" stroke-width="2"/>`;
+  } else if(s==="spike"){
+    let buds="";for(let i=0;i<7;i++){const y=22+i*6;const dx=(i%2?5:-5);buds+=`<ellipse cx="${50+dx}" cy="${y}" rx="6" ry="4" fill="${p}"/>`;}
+    body=`${buds}`;
+  } else if(s==="orchid"){
+    body=`<ellipse cx="50" cy="32" rx="10" ry="14" fill="${p}"/>
+          <ellipse cx="34" cy="48" rx="13" ry="9" fill="${p}" transform="rotate(-20 34 48)"/>
+          <ellipse cx="66" cy="48" rx="13" ry="9" fill="${p}" transform="rotate(20 66 48)"/>
+          <ellipse cx="42" cy="58" rx="9" ry="12" fill="${p}" opacity=".85"/>
+          <ellipse cx="58" cy="58" rx="9" ry="12" fill="${p}" opacity=".85"/>
+          <ellipse cx="50" cy="52" rx="7" ry="9" fill="${c}"/>`;
+  } else if(s==="blossom"){
+    let petals="";for(let i=0;i<5;i++){const a=i*72;petals+=`<path d="M50 50 Q44 26 50 20 Q56 26 50 50 Z" fill="${p}" transform="rotate(${a} 50 50)"/>`;}
+    body=`${petals}<circle cx="50" cy="42" r="5" fill="${c}"/>`;
+  } else if(s==="cluster"){
+    const dots=[[50,30],[40,38],[60,38],[35,50],[50,46],[65,50],[42,58],[58,58]];
+    let flr="";dots.forEach(d=>{flr+=`<g transform="translate(${d[0]-50},${d[1]-44})"><circle cx="50" cy="44" r="7" fill="${p}"/><circle cx="50" cy="44" r="2.5" fill="${c}"/></g>`;});
+    body=flr;
+  }
+  return `<svg viewBox="0 0 100 110" role="img" aria-label="${f.name} illustration">${stem}${body}</svg>`;
+}
+
+/* ---------- State ---------- */
+let favorites = new Set();
+let activeColors = new Set();
+let activeSeasons = new Set();
+let favOnly = false;
+let query = "";
+
+const grid = document.getElementById('grid');
+const countEl = document.getElementById('count');
+const toast = document.getElementById('toast');
+
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1400);}
+
+/* ---------- Filters UI ---------- */
+function buildChips(container, items, activeSet, label){
+  items.forEach(val=>{
+    const b=document.createElement('button');
+    b.className='chip';b.type='button';b.textContent=label==='color'?cap(val):cap(val);
+    b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',()=>{
+      if(activeSet.has(val)){activeSet.delete(val);b.setAttribute('aria-pressed','false');}
+      else{activeSet.add(val);b.setAttribute('aria-pressed','true');}
+      render();
+    });
+    container.appendChild(b);
+  });
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+buildChips(document.getElementById('colorFilters'),COLORS,activeColors,'color');
+buildChips(document.getElementById('seasonFilters'),SEASONS,activeSeasons,'season');
+
+document.getElementById('search').addEventListener('input',e=>{query=e.target.value.toLowerCase().trim();render();});
+const favBtn=document.getElementById('favOnly');
+favBtn.addEventListener('click',()=>{favOnly=!favOnly;favBtn.setAttribute('aria-pressed',String(favOnly));render();});
+
+/* ---------- Render ---------- */
+function render(){
+  const list=FLOWERS.filter(f=>{
+    if(query && !(f.name.toLowerCase().includes(query)||f.latin.toLowerCase().includes(query))) return false;
+    if(activeColors.size && !f.colors.some(c=>activeColors.has(c))) return false;
+    if(activeSeasons.size && !activeSeasons.has(f.season)) return false;
+    if(favOnly && !favorites.has(f.id)) return false;
+    return true;
+  });
+  grid.innerHTML="";
+  if(!list.length){
+    grid.innerHTML='<div class="empty"><p style="font-size:2rem">🥀</p><p>No flowers match just yet. Try clearing a filter or searching another name.</p></div>';
+  } else {
+    list.forEach(f=>{
+      const isFav=favorites.has(f.id);
+      const card=document.createElement('article');
+      card.className='card';
+      card.innerHTML=`
+        <div class="card-art" style="background:linear-gradient(145deg,${tint(f.petal)},#fff)">
+          ${flowerSVG(f)}
+          <button class="fav" aria-pressed="${isFav}" aria-label="${isFav?'Remove '+f.name+' from favourites':'Add '+f.name+' to favourites'}" data-id="${f.id}">${isFav?'❤️':'🤍'}</button>
+        </div>
+        <div class="card-body">
+          <h3>${f.name}</h3>
+          <div class="card-latin">${f.latin}</div>
+          <p>${f.desc}</p>
+          <div class="tags">
+            <span class="tag season">${cap(f.season)}</span>
+            ${f.colors.map(c=>`<span class="tag color">${cap(c)}</span>`).join('')}
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+  countEl.textContent=`${list.length} flower${list.length===1?'':'s'} shown`;
+}
+function tint(hex){
+  // light wash of the petal colour
+  const n=parseInt(hex.slice(1),16);
+  const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  return `rgba(${r},${g},${b},0.10)`;
+}
+
+grid.addEventListener('click',async e=>{
+  const btn=e.target.closest('.fav');
+  if(!btn)return;
+  const id=btn.dataset.id;
+  if(favorites.has(id)){
+    favorites.delete(id);
+    try{await factory.remove('favorites',id);}catch(_){}
+    showToast('Removed from your bouquet');
+  }else{
+    favorites.add(id);
+    try{await factory.put('favorites',id,{id,at:Date.now()});}catch(_){}
+    showToast('Added to your bouquet ❤️');
+  }
+  render();
+});
+
+/* ---------- Load favourites from cloud ---------- */
+async function init(){
+  try{
+    const docs=await factory.list('favorites');
+    if(Array.isArray(docs)) docs.forEach(d=>d&&d.id&&favorites.add(d.id));
+  }catch(_){}
+  render();
+}
+init();
+</script>
+<div id="factory-provenance" style="padding:14px 16px;text-align:center;font:11px/1.7 system-ui,sans-serif;color:#888;opacity:.85;">&#9874; Built with <a href="https://thefactory.refereeinnovations.com" style="color:#888;">The Factory</a> using third-party AI tools &#183; the app owner is responsible for its content &#183; Standard: UK law, aligned with the UN Universal Declaration of Human Rights &#183; <a href="https://thefactory.refereeinnovations.com/terms.html" style="color:#888;">Terms</a></div>
+</body>
+</html>
